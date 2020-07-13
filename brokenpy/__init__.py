@@ -24,8 +24,11 @@ class BrokenLinkPy():
                 target_url = i_data
                 print("[+]=================================[{}]==============================".format(i_data))
                 founded_data[i_data] =[]
-                req = requests.get(target_url)
-                soup = BeautifulSoup(req.content, 'html5lib')
+                with requests.Session() as s:
+                    s.headers={"User-Agent":"Mozilla/5.0"}
+                    s.headers.update({'Content-Type': 'application/x-www-form-urlencoded'})
+                    req = s.get(target_url)
+                    soup = BeautifulSoup(req.content, 'html5lib')
                 all_links = soup.find_all('a', href = True)
                 for link in all_links:
                     founded_data[i_data].append(link.attrs['href'])
@@ -41,14 +44,15 @@ class BrokenLinkPy():
                         for i_in in founded_data[i_data]:
                             
                             if ss_data in i_in:
-                                print(i_in)
-                        
-                
-                
-           
-
-                       
-            
+                                with requests.Session() as s:
+                                    s.headers={"User-Agent":"Mozilla/5.0"}
+                                    s.headers.update({'Content-Type': 'application/x-www-form-urlencoded'})
+                                    req = s.get(i_in)
+                                    if req.status_code == 404:
+                                        print("site:{}  status code:[{}]".format(i_in,req.status_code))
+                                    elif req.status_code == 200:
+                                        print("site:{}  status code:[{}]".format(i_in,req.status_code))
+                                                    
        except KeyboardInterrupt:
            pass
 
